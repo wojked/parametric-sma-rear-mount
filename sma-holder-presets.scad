@@ -7,10 +7,10 @@ MOUNT_HEIGHT= 6.75;     // 6.75
 /* [BRIDGE] */
 BRIDGE_WIDTH = WIDTH;
 MIN_BRIDGE_WIDTH = WIDTH/2;
-BRIDGE_HEIGHT = 14;  // MOUNT_HEIGHT
-BRIDGE_ANGLE = 45;
-BRIDGE_X_OFFSET = 12;
-BRIDGE_Z_OFFSET = 5;
+BRIDGE_HEIGHT = 14;     // MOUNT_HEIGHT
+BRIDGE_ANGLE = 30;      // [0:5:60]
+BRIDGE_X_OFFSET = 9;    // [0:1:15]
+BRIDGE_Z_OFFSET = 3;    // [0:1:15]
 BRIDGE_THICKNESS = 1;
 
 /* [SMA] */
@@ -21,10 +21,10 @@ SMA_CUTOUT_WIDTH = WIDTH - 4*MOUNT_THICKNESS;
 SMA_CUTOUT_HEIGHT = 12;
 
 /* [META] */
-TEST_WIDTH = true;     // [false, true]
+TEST_WIDTH = false;     // [false, true]
 HULL_TYPE = 2;          // [0,1,2]
-CORNERS_DIAMETER = 4;   // [16:0.5:40]
-BOUNDED = false;        // [true, false]
+CORNERS_DIAMETER = 4;
+BOUNDED = true;         // [true, false]
 FN = 64;                // [0:32:256]  
 
 /* [HIDDEN] */
@@ -110,8 +110,7 @@ module sma_holder(){
             
             translate([0,0,0])            
             sma_plate();        
-        }       
-        
+        }                
     }
 }
 
@@ -170,17 +169,20 @@ module bridge(wider_width, min_width, height, thickness){
 }
 
 module sma_hole(){
-    cylinder(BRIDGE_THICKNESS*10, SMA_HOLE_DIAMETER/2, SMA_HOLE_DIAMETER/2, true);            
+    color("grey")
+    cylinder(BRIDGE_THICKNESS*20, SMA_HOLE_DIAMETER/2, SMA_HOLE_DIAMETER/2, true);            
 }
 
 module sma_outliner(){
     outliner_thickness = BRIDGE_THICKNESS*10;
-    translate([0,0,outliner_thickness/2])
+    color("grey")    
+    translate([0,0,outliner_thickness/2])    
     cylinder(outliner_thickness, SMA_OUTLINER_DIAMETER/2, SMA_OUTLINER_DIAMETER/2, true);            
 }
 
 module sma_plate(){
     outliner_thickness = BRIDGE_THICKNESS*20;
+    color("grey")
     translate([0,0,outliner_thickness/2+BRIDGE_THICKNESS/2])
     cube([SMA_CUTOUT_WIDTH, SMA_CUTOUT_HEIGHT, outliner_thickness], true);            
 }
