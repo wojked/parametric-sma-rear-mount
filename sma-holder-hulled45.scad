@@ -21,10 +21,11 @@ SMA_CUTOUT_WIDTH = WIDTH - 4*MOUNT_THICKNESS;
 SMA_CUTOUT_HEIGHT = 12;
 
 /* [META] */
+TEST_WIDTH = true;     // [false, true]
 HULL_TYPE = 2;          // [0,1,2]
 CORNERS_DIAMETER = 4;   // [16:0.5:40]
-BOUNDED = false;         // [true, false]
-FN = 64;               // [0:32:256]  
+BOUNDED = false;        // [true, false]
+FN = 64;                // [0:32:256]  
 
 /* [HIDDEN] */
 $fn = FN;
@@ -34,29 +35,37 @@ sma_holder();
 
 module sma_holder(){
     difference(){
-        if(HULL_TYPE==0){
+        if(TEST_WIDTH){
             union(){
-                side_mounts();
-                vertical_bridge();                
-                bridge_with_mount();   
-            }            
-        }
-        if(HULL_TYPE==1){            
-            hull(){
-                side_mounts();
-                vertical_bridge();
-                bridge_with_mount();            
+                side_mounts(2);       
+                vertical_bridge(2);                     
             }
         }
-        if(HULL_TYPE==2){
-            union(){
-                side_mounts();
+        else{
+            if(HULL_TYPE==0){
+                union(){
+                    side_mounts(MOUNT_HEIGHT);
+                    vertical_bridge(MOUNT_HEIGHT);                
+                    bridge_with_mount();   
+                }            
+            }
+            if(HULL_TYPE==1){            
                 hull(){
-                    vertical_bridge();                
-                    bridge_with_mount();                            
+                    side_mounts(MOUNT_HEIGHT);
+                    vertical_bridge(MOUNT_HEIGHT);
+                    bridge_with_mount();            
                 }
-            }            
-        }        
+            }
+            if(HULL_TYPE==2){
+                union(){
+                    side_mounts(MOUNT_HEIGHT);
+                    hull(){
+                        vertical_bridge(MOUNT_HEIGHT);                
+                        bridge_with_mount();                            
+                    }
+                }            
+            }
+        }      
 
         // Poles
         side_poles();
@@ -106,21 +115,21 @@ module sma_holder(){
     }
 }
 
-module side_mounts(){
+module side_mounts(height){
     x_offset = WIDTH/2 - MOUNT_DIAMETER/2;
     
     translate([-x_offset,0,0])    
-    mount();
+    mount(height);
 
     translate([x_offset,0,0])
-    mount();    
+    mount(height);    
 }
 
-module mount(){
+module mount(height){
     outside_diameter = MOUNT_DIAMETER + MOUNT_THICKNESS;    
     
-    translate([0,0, MOUNT_HEIGHT/2])
-    cylinder(MOUNT_HEIGHT, outside_diameter/2, outside_diameter/2, true);
+    translate([0,0, height/2])
+    cylinder(height, outside_diameter/2, outside_diameter/2, true);
 }
 
 module side_poles(){
@@ -140,9 +149,9 @@ module pole(){
     cylinder(MOUNT_HEIGHT*2, MOUNT_DIAMETER/2, MOUNT_DIAMETER/2, true);        
 }
 
-module vertical_bridge(){
-    translate([0,0, MOUNT_HEIGHT/2])    
-    cube([BRIDGE_WIDTH+MOUNT_THICKNESS, BRIDGE_THICKNESS, MOUNT_HEIGHT], true);      
+module vertical_bridge(height){
+    translate([0,0, height/2])    
+    cube([BRIDGE_WIDTH+MOUNT_THICKNESS, BRIDGE_THICKNESS, height], true);      
 }
 
 module bridge_with_mount(){
