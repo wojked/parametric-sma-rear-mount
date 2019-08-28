@@ -81,7 +81,6 @@ module sma_holder(){
             translate([0,SMA_HOLE_OFFSET,0])
             sma_outliner();                 
             
-            translate([0,0,0])            
             sma_plate();        
         }
         
@@ -98,7 +97,6 @@ module sma_holder(){
     }
 
     if(DEBUG){
-        
         translate([0,BRIDGE_X_OFFSET, BRIDGE_THICKNESS/2 + BRIDGE_Z_OFFSET])
         rotate([BRIDGE_ANGLE,0,0])       
         union(){
@@ -154,11 +152,6 @@ module vertical_bridge(height){
 }
 
 module bridge_with_mount(){
-//    if(BRIDGE_X_OFFSET>0){
-//        translate([0,0, BRIDGE_THICKNESS/2 + BRIDGE_Z_OFFSET])            
-//        bridge(BRIDGE_WIDTH, BRIDGE_WIDTH, BRIDGE_X_OFFSET, BRIDGE_THICKNESS);    
-//    }
-    
     translate([0,BRIDGE_X_OFFSET, BRIDGE_THICKNESS/2 + BRIDGE_Z_OFFSET])
     rotate([BRIDGE_ANGLE,0,0])    
     bridge(BRIDGE_WIDTH, MIN_BRIDGE_WIDTH, BRIDGE_HEIGHT, BRIDGE_THICKNESS);  
@@ -190,9 +183,8 @@ module sma_plate(){
 
 module rounded_corners_trapeze(bottom_width, upper_width, height, depth, corner_curve){
     x_translate = bottom_width-corner_curve;
-    y_translate = height-corner_curve;     
-    
-    x_translate2 = upper_width-corner_curve;
+    x_translate2 = upper_width-corner_curve;    
+    y_translate = height-corner_curve;
     
     
     hull(){

@@ -62,6 +62,27 @@
             "SMA_OUTLINER_DIAMETER": "9.09",
             "TEST_WIDTH": "false",
             "WIDTH": "30"
+        },
+        "simple": {
+            "BOUNDED": "true",
+            "BRIDGE_ANGLE": "30",
+            "BRIDGE_HEIGHT": "14",
+            "BRIDGE_THICKNESS": "1",
+            "BRIDGE_X_OFFSET": "9",
+            "BRIDGE_Z_OFFSET": "3",
+            "CORNERS_DIAMETER": "4",
+            "DEBUG": "false",
+            "FN": "64",
+            "HULL_TYPE": "0",
+            "MOUNT_DIAMETER": "5.7",
+            "MOUNT_HEIGHT": "6.75",
+            "MOUNT_THICKNESS": "4",
+            "SMA_CUTOUT_HEIGHT": "12",
+            "SMA_HOLE_DIAMETER": "5.95",
+            "SMA_HOLE_OFFSET": "0",
+            "SMA_OUTLINER_DIAMETER": "9.09",
+            "TEST_WIDTH": "false",
+            "WIDTH": "30"
         }
     },
     "fileFormatVersion": "1"
