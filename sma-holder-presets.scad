@@ -19,11 +19,11 @@ VERTICAL_BRIDGE_THICKNESS = 1;
 VERTICAL_BRIDGE_OFFSET = -VERTICAL_BRIDGE_THICKNESS/2;
 
 /* [SMA] */
-SMA_HOLE_OFFSET = -0.6; //1, -3.2
+SMA_HOLE_OFFSET = -0.5; //1, -3.2
 SMA_HOLE_DIAMETER = 6.5;
 SMA_OUTLINER_DIAMETER = 0;
 SMA_CUTOUT_WIDTH = WIDTH - 4*MOUNT_THICKNESS - 4.2; //-3.8
-SMA_CUTOUT_HEIGHT = 9; //12
+SMA_CUTOUT_HEIGHT = 8; //12
 
 /* [SHELF] */
 WITH_SHELF = true;    //[true, false]
@@ -166,6 +166,7 @@ module sma_holder(){
     
     if(WITH_ARROWS){
         rotate([180,0,0])
+        translate([0,-2,0])
         union(){
             translate([0,-2,0])
             arrows(ARROWS_THICKNESS);
