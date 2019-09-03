@@ -1,37 +1,51 @@
 /* [MOUNT] */
-WIDTH = 24.50;
-MOUNT_DIAMETER = 4.95;
+WIDTH = 25.0;
+MOUNT_DIAMETER = 5.5;  //4.95
 MOUNT_THICKNESS = 2.5;
-MOUNT_HEIGHT= 6.75;     // 6.75
+MOUNT_HEIGHT= 7.00;     // 6.75
 
-/* [SHELF] */
-BRIDGE_WIDTH = WIDTH;
-MIN_BRIDGE_WIDTH = WIDTH/2;
-BRIDGE_HEIGHT = 14;     // MOUNT_HEIGHT
-BRIDGE_ANGLE = 30;      // [0:5:60]
-BRIDGE_X_OFFSET = 12;    // [0:1:20]
-BRIDGE_Z_OFFSET = 2.5;    // [0:1:15]
+/* [BRIDGE] */
+BRIDGE_WIDTH = WIDTH - 10;   //8 is not catching up to much
+MIN_BRIDGE_WIDTH = WIDTH - 13;
+BRIDGE_HEIGHT = 10;     // MOUNT_HEIGHT -->14
+BRIDGE_ANGLE = 55;      // [0:5:60]
+BRIDGE_X_OFFSET = 18;    // [0:1:20]
+BRIDGE_Z_OFFSET = 3.5;    // [0:1:15] -->2.5
 BRIDGE_THICKNESS = 1.5;
 
 /* [VERTICAL_BRIDGE] */
-VERTICAL_BRIDGE_WIDTH = BRIDGE_WIDTH + 2;
-VERTICAL_BRIDGE_OFFSET = 1;
+VERTICAL_BRIDGE_WIDTH = WIDTH - 6;  //-6
 VERTICAL_BRIDGE_THICKNESS = 1;
+VERTICAL_BRIDGE_OFFSET = -VERTICAL_BRIDGE_THICKNESS/2;
 
 /* [SMA] */
-SMA_HOLE_OFFSET = 1;
+SMA_HOLE_OFFSET = -0.6; //1, -3.2
 SMA_HOLE_DIAMETER = 6.5;
 SMA_OUTLINER_DIAMETER = 0;
-SMA_CUTOUT_WIDTH = WIDTH - 4*MOUNT_THICKNESS - 3.8;
-SMA_CUTOUT_HEIGHT = 13;
+SMA_CUTOUT_WIDTH = WIDTH - 4*MOUNT_THICKNESS - 4.2; //-3.8
+SMA_CUTOUT_HEIGHT = 9; //12
 
 /* [SHELF] */
-WITH_SHELF= true;    //[true, false]
-SHELF_LENGTH = 15;
-SHELF_Y_OFFSET = 10;
-SHELF_THICKNESS = 2;
+WITH_SHELF = true;    //[true, false]
+VTX_WIDTH = 17.5;
+SHELF_WIDTH = VTX_WIDTH + 4.5 ; 
+SHELF_LENGTH = 18;
+SHELF_Y_OFFSET = 6;    //10
+SHELF_THICKNESS = 1.2;
+ADDITIONAL_CUTOUT_ANGLE = BRIDGE_ANGLE - 35;
+ADDITIONAL_CUTOUT_Z_OFFSET = 1;
+
+/* [ARROWS] */
+WITH_ARROWS = true;     //[true, false]
+ARROWS_SPACER = 7;
+ARROWS_THICKNESS = 0.5;
+ARROWS_ARM_WIDTH = 1.5;
+ARROWS_ARM_LENGTH = 7;
 
 /* [META] */
+ZIPTIE_WIDTH = 3.5;
+ZIPTIE_THICKNESS = 1.6; //0.7
+
 TEST_WIDTH = false;     // [false, true]
 HULL_TYPE = 2;          // [0,1,2]
 CORNERS_DIAMETER = 4;
@@ -42,6 +56,7 @@ FN = 64;                // [0:32:256]
 $fn = FN;
 DEBUG = false;
 
+rotate([180,0,0])
 sma_holder();
 
 module sma_holder(){
@@ -114,10 +129,11 @@ module sma_holder(){
         //Additional cutout
         if(WITH_SHELF){
             union(){
-                width = WIDTH - 6;
-                cutout_thickness = 2;
-                translate([0,0,MOUNT_HEIGHT-cutout_thickness/2])
-                cube([width, 10, cutout_thickness],true);            
+                width = BRIDGE_WIDTH - 2;
+                cutout_thickness = 5;
+                translate([0,2,MOUNT_HEIGHT-cutout_thickness/2+ADDITIONAL_CUTOUT_Z_OFFSET])
+                rotate([ADDITIONAL_CUTOUT_ANGLE,0,0])
+                cube([width, 30 , cutout_thickness],true);            
             }
         }
         
@@ -132,7 +148,7 @@ module sma_holder(){
         }        
         
     }
-
+    
     if(DEBUG){
         translate([0,BRIDGE_X_OFFSET, BRIDGE_THICKNESS/2 + BRIDGE_Z_OFFSET])
         rotate([BRIDGE_ANGLE,0,0])       
@@ -143,10 +159,21 @@ module sma_holder(){
             translate([0,SMA_HOLE_OFFSET,0])
             sma_outliner();                 
             
-            translate([0,0,0])            
+            translate([0,SMA_HOLE_OFFSET,0])            
             sma_plate();        
         }                
     }
+    
+    if(WITH_ARROWS){
+        rotate([180,0,0])
+        union(){
+            translate([0,-2,0])
+            arrows(ARROWS_THICKNESS);
+            translate([0,-ARROWS_SPACER,0])
+            arrows(ARROWS_THICKNESS);    
+        }
+    }
+    
 }
 
 module side_mounts(height){
@@ -219,27 +246,50 @@ module sma_plate(){
 
 
 module shelf(thickness){
-    holder_thickness = 2;
+    holder_thickness = thickness + 0.5;
+    width = SHELF_WIDTH;
     
     translate([0,-SHELF_LENGTH/2-SHELF_Y_OFFSET,-thickness/2])
-    cube([BRIDGE_WIDTH, SHELF_LENGTH, thickness], true);           
-
-    straight_shelf_holders(BRIDGE_WIDTH, holder_thickness);
+    difference(){
+        cube([width, SHELF_LENGTH, thickness], true);
+        translate([0,-4,0])        
+        shelf_zipties(width, thickness);    
+    }
+    
+    straight_shelf_holders(width, holder_thickness);
 
 //    translate([0,0,-MOUNT_HEIGHT+holder_thickness])
 //    straight_shelf_holders(BRIDGE_WIDTH, holder_thickness);    
     
-    angled_shelf_holders(BRIDGE_WIDTH, holder_thickness);
+    angled_shelf_holders(width, holder_thickness);
     
 //    translate([0,-15,0])
 //    vtx(2);
 }
 
+module shelf_zipties(width, thickness){
+    ziptie_cutout = (SHELF_WIDTH - VTX_WIDTH)/2;    
+    x_offset = width/2 - ziptie_cutout/2;
+    y_offset = 0;    
+    
+    union(){
+        translate([x_offset, 0, 0])
+        shelf_ziptie(ziptie_cutout, thickness);
+        
+        translate([-x_offset, 0, 0])
+        shelf_ziptie(ziptie_cutout, thickness);    
+    }         
+}
+
+module shelf_ziptie(ziptie_cutout, thickness){
+    cube([ziptie_cutout, ZIPTIE_WIDTH, thickness*2], true);  
+}
+
 module straight_shelf_holders(width, thickness){
     angle = 90;
-    length1 = 12;
+    length1 = 10;
     x_offset = width/2 - thickness/2;
-    y_offset = 0;
+    y_offset = 2;
     
     translate([0,-y_offset,-thickness/2])
     rotate([angle,0,0])
@@ -254,9 +304,9 @@ module straight_shelf_holders(width, thickness){
 
 module angled_shelf_holders(width, thickness){
     angle = 60;
-    length1 = 15;
+    length1 = 20;
     x_offset = width/2 - thickness/2;
-    y_offset = -1;
+    y_offset = 2.5;
     
     translate([0,y_offset,-length1/2])
     rotate([angle,0,0])
@@ -275,37 +325,25 @@ module shelf_holder(thickness, length){
     
 }
 
-module vtx(h)
-{
+module arrow_arm(thickness){
+    width = ARROWS_ARM_WIDTH;
+    length = ARROWS_ARM_LENGTH;
+    hull(){
+        cylinder(thickness,width/2, width/2, true);
+
+        translate([-length,0,0])
+        cylinder(thickness,width/2, width/2, true);        
+    }    
+}
+
+module arrows(thickness){
+    angle = 45;
     
-  HEIGHT = 2;
-  fudge = 0.1;
-  //From INKSCAPE
+    rotate([0,0,angle])
+    arrow_arm(thickness);
     
-  SCALE = 3.58;
-  translate([0,0,HEIGHT/2])
-  rotate([0,0,0])    
-  scale([SCALE,SCALE,HEIGHT])    
-  scale([25.4/90, -25.4/90, 1]) union()
-  {
-    difference()
-    {
-       linear_extrude(height=h)
-         polygon([[-8.674923,-12.135435],[-8.674923,-3.728712],[-8.674923,-2.746859],[-4.376478,-2.746859],[-4.376478,-2.634721],[-4.376478,1.861645],[-2.013831,1.861645],[-2.013831,3.869275],[-4.340304,3.869275],[-4.340304,3.560249],[-8.275981,3.560249],[-8.275981,3.567483],[-8.606711,3.567483],[-8.606711,12.106497],[-5.498372,12.106497],[-5.498372,10.396008],[-5.498372,9.813613],[-5.048271,9.813613],[-4.428154,9.813613],[-4.428154,9.381598],[-3.728455,9.381598],[-3.728455,6.487718],[-3.975986,6.487718],[-3.975986,6.479966],[-5.711280,6.479966],[-5.711280,8.034912],[-7.299296,8.034912],[-7.299296,5.429385],[-7.299296,4.503343],[-5.711280,4.503343],[-2.404504,4.503343],[-2.404504,4.602562],[-2.404504,5.429385],[-2.404504,7.744489],[-2.418458,7.744489],[-2.418458,8.329983],[0.273367,8.329983],[0.273367,9.133551],[0.951362,9.133551],[0.951362,9.736616],[0.951362,10.001200],[0.951362,10.787197],[2.505789,10.787197],[2.505789,10.001200],[4.319116,10.001200],[4.319116,10.298856],[4.970238,10.298856],[4.970238,6.775040],[5.746419,6.775040],[7.698753,6.775040],[7.698753,12.135435],[8.650118,12.135435],[8.650118,6.775040],[8.650118,2.456958],[8.650118,2.308130],[8.650118,0.968158],[8.650118,-1.984116],[8.674923,-1.984116],[8.674923,-12.059470],[8.599990,-12.059470],[8.599990,-12.065153],[4.444688,-12.065153],[0.104902,-12.065153],[0.104902,-7.004481],[-4.126365,-7.004481],[-4.126365,-12.135435],[-8.674923,-12.135435]]);
-       translate([0, 0, -fudge])
-         linear_extrude(height=h+2*fudge)
-           polygon([[4.444688,-7.651988],[7.898741,-7.651988],[7.898741,-3.962807],[7.002155,-3.962807],[7.002155,0.633812],[0.289388,0.633812],[0.289388,-1.861127],[0.255281,-1.861127],[0.255281,-3.682204],[4.444172,-3.682204],[4.444172,-4.838205],[4.444172,-7.004481],[4.444688,-7.651988]]);
-       translate([0, 0, -fudge])
-         linear_extrude(height=h+2*fudge)
-           polygon([[-1.462961,-4.464068],[-0.216008,-4.464068],[-0.216008,-3.682204],[-0.216008,-1.861127],[-1.462961,-1.861127],[-1.462961,-4.464068]]);
-       translate([0, 0, -fudge])
-         linear_extrude(height=h+2*fudge)
-           polygon([[4.192508,2.456958],[5.746419,2.456958],[5.746419,5.311047],[4.970238,5.311047],[4.749064,5.311047],[4.319116,5.311047],[4.192508,5.311047],[4.192508,2.456958]]);
-       translate([0, 0, -fudge])
-         linear_extrude(height=h+2*fudge)
-           polygon([[-1.426271,4.640802],[3.894852,4.640802],[3.894852,5.311047],[3.861779,5.311047],[3.861779,9.067406],[2.075841,9.067406],[2.075841,8.141364],[1.182873,8.141364],[1.182873,7.744489],[-1.426271,7.744489],[-1.426271,4.640802]]);
-    }
-  }
+    rotate([0,0,180-angle])    
+    arrow_arm(thickness);
 }
 
 module rounded_corners_trapeze(bottom_width, upper_width, height, depth, corner_curve){
