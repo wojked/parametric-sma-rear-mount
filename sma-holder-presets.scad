@@ -27,6 +27,7 @@ SMA_CUTOUT_HEIGHT = 8; //12
 
 /* [SHELF] */
 WITH_SHELF = true;    //[true, false]
+SHELF_ONLY = true;
 VTX_WIDTH = 17.5;
 SHELF_WIDTH = VTX_WIDTH + 4.5 ; 
 SHELF_LENGTH = 18;
@@ -47,7 +48,7 @@ ZIPTIE_WIDTH = 3.5;
 ZIPTIE_THICKNESS = 1.6; //0.7
 
 TEST_WIDTH = false;     // [false, true]
-HULL_TYPE = 2;          // [0,1,2]
+HULL_TYPE = 2;          // [-1,0,1,2]
 CORNERS_DIAMETER = 4;
 BOUNDED = true;         // [true, false]
 FN = 64;                // [0:32:256]  
@@ -67,7 +68,17 @@ module sma_holder(){
                 vertical_bridge(2);                     
             }
         }
-        else{
+        else if(SHELF_ONLY){
+            union(){
+                if(WITH_SHELF){
+                    translate([0,0,MOUNT_HEIGHT])
+                    shelf(SHELF_THICKNESS);
+                }                    
+                side_mounts(MOUNT_HEIGHT);
+                vertical_bridge(MOUNT_HEIGHT);  
+            }                
+        }
+        else{        
             if(HULL_TYPE==0){
                 union(){
                     if(WITH_SHELF){
@@ -127,7 +138,7 @@ module sma_holder(){
         }
         
         //Additional cutout
-        if(WITH_SHELF){
+        if(WITH_SHELF && !SHELF_ONLY){
             union(){
                 width = BRIDGE_WIDTH - 2;
                 cutout_thickness = 5;
@@ -216,7 +227,7 @@ module vertical_bridge(height){
     cube([VERTICAL_BRIDGE_WIDTH, VERTICAL_BRIDGE_THICKNESS, height], true);      
 }
 
-module bridge_with_mount(){
+module bridge_with_mount(){ 
     translate([0,BRIDGE_X_OFFSET, BRIDGE_THICKNESS/2 + BRIDGE_Z_OFFSET])
     rotate([BRIDGE_ANGLE,0,0])    
     bridge(BRIDGE_WIDTH, MIN_BRIDGE_WIDTH, BRIDGE_HEIGHT, BRIDGE_THICKNESS);  
