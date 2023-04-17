@@ -30,17 +30,17 @@ WITH_SHELF = true;    //[true, false]
 VTX_WIDTH = 17.5;
 SHELF_WIDTH = VTX_WIDTH + 4.5 ; 
 SHELF_LENGTH = 18;
-SHELF_Y_OFFSET = 6;    //10
+SHELF_Y_OFFSET = 8;    //10
 SHELF_THICKNESS = 1.2;
 ADDITIONAL_CUTOUT_ANGLE = BRIDGE_ANGLE - 35;
 ADDITIONAL_CUTOUT_Z_OFFSET = 1;
 
 /* [ARROWS] */
 WITH_ARROWS = true;     //[true, false]
-ARROWS_SPACER = 7;
+ARROWS_SPACER = 6.5;
 ARROWS_THICKNESS = 0.5;
 ARROWS_ARM_WIDTH = 1.5;
-ARROWS_ARM_LENGTH = 7;
+ARROWS_ARM_LENGTH = 7.5;
 
 /* [META] */
 ZIPTIE_WIDTH = 3.5;
@@ -257,7 +257,7 @@ module shelf(thickness){
         shelf_zipties(width, thickness);    
     }
     
-    straight_shelf_holders(width, holder_thickness);
+//    straight_shelf_holders(width, holder_thickness);
 
 //    translate([0,0,-MOUNT_HEIGHT+holder_thickness])
 //    straight_shelf_holders(BRIDGE_WIDTH, holder_thickness);    
@@ -286,38 +286,55 @@ module shelf_ziptie(ziptie_cutout, thickness){
     cube([ziptie_cutout, ZIPTIE_WIDTH, thickness*2], true);  
 }
 
-module straight_shelf_holders(width, thickness){
-    angle = 90;
-    length1 = 10;
-    x_offset = width/2 - thickness/2;
-    y_offset = 2;
-    
-    translate([0,-y_offset,-thickness/2])
-    rotate([angle,0,0])
-    union(){
-        translate([x_offset, 0, 0])
-        shelf_holder(thickness, length1);
-        
-        translate([-x_offset, 0, 0])
-        shelf_holder(thickness, length1);    
-    }    
-}
+//module straight_shelf_holders(width, thickness){
+//    angle = 90;
+//    length1 = 10;
+//    x_offset = width/2 - thickness/2;
+//    y_offset = 2;
+//    
+//    translate([0,-y_offset,-thickness/2])
+//    rotate([angle,0,0])
+//    union(){
+//        translate([x_offset, 0, 0])
+//        shelf_holder(thickness, length1);
+//        
+//        translate([-x_offset, 0, 0])
+//        shelf_holder(thickness, length1);    
+//    }    
+//}
 
 module angled_shelf_holders(width, thickness){
     angle = 60;
-    length1 = 20;
+    length1 = 14;
     x_offset = width/2 - thickness/2;
-    y_offset = 2.5;
+    y_offset = -2;
     
-    translate([0,y_offset,-length1/2])
-    rotate([angle,0,0])
+    translate([0,y_offset,0])
     union(){
         translate([x_offset, 0, 0])
-        shelf_holder(thickness, length1);
+        angled_shelf_holder(length1,thickness); 
         
         translate([-x_offset, 0, 0])
-        shelf_holder(thickness, length1);    
+        angled_shelf_holder(length1,thickness); 
     }
+}
+
+module angled_shelf_holder(length, thickness){
+    y_offset = 2.5;
+    
+    base_height = 1;
+    base_width = 3;
+    
+    hull(){
+        translate([0, 0, -MOUNT_HEIGHT+base_height/2])
+        cube([thickness,base_width,base_height], true);
+        
+        translate([0, 0, -base_height/2])
+        cube([thickness,base_width,base_height], true);
+        
+        translate([0, -length, -base_height/2])
+        cube([thickness,base_width,base_height], true);
+    }    
 }
 
 module shelf_holder(thickness, length){
